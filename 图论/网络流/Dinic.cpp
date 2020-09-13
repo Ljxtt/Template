@@ -50,13 +50,6 @@ int dinic(int s, int flow){
     }
     return flow - rest;
 }
-void show(void){
-    for(int i = 1; i <= n; i++){
-        for(int j = head[i]; j; j = nex[j]){
-            printf("%d %d %d\n", i, ver[j], edge[j]);
-        }
-    }
-}
 int main(void){
 #ifdef ljxtt
 freopen("data.in", "r", stdin);
