@@ -26,8 +26,7 @@ void add(int x, int y, int z){
 queue<int> que;
 bool bfs(int s, int t){
     while(que.size()) que.pop();
-    mem(d, 0);
-    d[s] = 1;
+    mem(d, 0); d[s] = 1;
     que.push(s); 
     while(que.size()){
         int now = que.front(); que.pop();
@@ -58,8 +57,8 @@ int dfs(int s, int t, int flow){
     return flow - rest;
 }
 ll dinic(int s, int t){
-    ll maxflow = 0;
-    while(bfs(s, t)) maxflow += dfs(s, t, inf);
+    ll maxflow = 0, flow = 0;
+    while(bfs(s, t)) while(flow = dfs(s, t, inf)) maxflow += flow;
     return maxflow;
 }
 int main(void){
