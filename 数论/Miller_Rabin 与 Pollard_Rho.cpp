@@ -2,6 +2,9 @@
 * Miller_Rabin 算法进行素数测试
 * 速度快可以判断一个小于 2^63 的数是不是素数
 * 成功概率极大，S 一般 8 - 10，测试 5e5 组数据无错，不能用 int128 可以换成快速乘，速度会慢很多
+* 
+* Pollard_Rho 算法质因数分解
+* 时间复杂度为 O(n ^(1/4))。
 /* **************************************************/
 #include <bits/stdc++.h>
 #define lowbit(x) ((x) & (-x))
@@ -16,6 +19,8 @@ const int inf = 0x3f3f3f3f;
 // const int maxn = e + 7;
 using namespace std;
 
+mt19937 myrand(time(0));
+ll factor[1000], tol;       //记得初始化
 ll qmul(__int128 a, __int128 b, ll mod) {
         return a * b % mod;
 //     ll ans = 0;
@@ -48,8 +53,9 @@ bool judge(ll a, ll n, ll x, ll t) {
     }
     return ans != 1;
 }
+
 bool Miller_Rabin(ll n) {
-    int S = 8;  //随机算法判定次数一般 8∼10 就够了
+    int S = 8;          //随机算法判定次数一般 8∼10 就够了
     if (n == 2) return true;
     if (n < 2 || !(n & 1)) return false;
     ll x = n - 1, t = 0;
@@ -57,13 +63,35 @@ bool Miller_Rabin(ll n) {
         x >>= 1; t++;
     }
 
-    srand(time(NULL)); 
     for (int i = 0; i < S; i++) {
-        ll a = rand() % (n - 1) + 1;
+        ll a = myrand() % (n - 1) + 1;
         if (judge(a, n, x, t)) return false;
     }
     return true;
 }
+
+ll Pollard_Rho(ll x, ll c){
+    ll k = 2, x0 = myrand() % (x - 1) + 1, y = x0;
+    for(int i = 2; 1; i++){
+        x0 = (qmul(x0, x0, x) + c) % x;
+        ll d = __gcd(abs(y - x0), x);
+        if(d != 1 && d != x) return d;
+        if(y == x0) return x;
+        if(i == k){y = x0; k <<= 1;}
+    }
+}
+
+void findfac(ll n){
+    if(n == 1) return;
+    if(Miller_Rabin(n)){
+        factor[tol++] = n;
+        return;
+    }
+    ll p = n, c = 107;
+    while(p >= n) p = Pollard_Rho(p, c--);
+    findfac(p); findfac(n / p);
+}
+
 int main(void) {
 #ifdef ljxtt
     freopen("data.in", "r", stdin);
